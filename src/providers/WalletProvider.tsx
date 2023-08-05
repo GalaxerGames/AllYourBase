@@ -11,18 +11,12 @@ import { metaMaskWallet } from '@rainbow-me/rainbowkit/wallets'
 import { baseGoerli } from 'viem/chains'
 import { configureChains, createConfig, WagmiConfig } from 'wagmi'
 import { publicProvider } from 'wagmi/providers/public'
+import throwIfUndefined from '@/utils/throwIfUndefined'
 
 type WalletProviderProps = {
   children: React.ReactNode
 }
 
-const throwIfUndefined = (input: string | undefined, errorMessage: string) => {
-  if (!input) {
-    throw new Error(errorMessage)
-  }
-
-  return input
-}
 const WalletProvider: React.FC<WalletProviderProps> = ({ children }) => {
   const { chains, publicClient } = configureChains(
     [baseGoerli],
