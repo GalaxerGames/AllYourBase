@@ -5,6 +5,7 @@ import '@rainbow-me/rainbowkit/styles.css'
 import {
   connectorsForWallets,
   darkTheme,
+  getDefaultWallets,
   RainbowKitProvider,
 } from '@rainbow-me/rainbowkit'
 import { metaMaskWallet } from '@rainbow-me/rainbowkit/wallets'
@@ -23,20 +24,14 @@ const WalletProvider: React.FC<WalletProviderProps> = ({ children }) => {
     [publicProvider()]
   )
 
-  const connectors = connectorsForWallets([
-    {
-      groupName: 'Recommended',
-      wallets: [
-        metaMaskWallet({
-          projectId: throwIfUndefined(
-            process.env.NEXT_PUBLIC_PROJECT_ID,
-            'Missing env PROJECT_ID'
-          ),
-          chains,
-        }),
-      ],
-    },
-  ])
+  const { connectors } = getDefaultWallets({
+    appName: 'Galaxer',
+    projectId: throwIfUndefined(
+      process.env.NEXT_PUBLIC_PROJECT_ID,
+      'Missing env PROJECT_ID'
+    ),
+    chains,
+  })
 
   const wagmiConfig = createConfig({
     autoConnect: true,
