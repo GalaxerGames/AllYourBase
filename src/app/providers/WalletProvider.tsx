@@ -15,6 +15,14 @@ import { publicProvider } from 'wagmi/providers/public'
 type WalletProviderProps = {
   children: React.ReactNode
 }
+
+const throwIfUndefined = (input: string | undefined, errorMessage: string) => {
+  if (!input) {
+    throw new Error(errorMessage)
+  }
+
+  return input
+}
 const WalletProvider: React.FC<WalletProviderProps> = ({ children }) => {
   const { chains, publicClient } = configureChains(
     [baseGoerli],
@@ -24,7 +32,15 @@ const WalletProvider: React.FC<WalletProviderProps> = ({ children }) => {
   const connectors = connectorsForWallets([
     {
       groupName: 'Recommended',
-      wallets: [metaMaskWallet({ projectId: '', chains })],
+      wallets: [
+        metaMaskWallet({
+          projectId: throwIfUndefined(
+            process.env.NEXT_PUBLIC_PROJECT_ID,
+            'Missing env PROJECT_ID'
+          ),
+          chains,
+        }),
+      ],
     },
   ])
 
