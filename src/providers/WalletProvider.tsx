@@ -2,17 +2,15 @@
 
 import '@rainbow-me/rainbowkit/styles.css'
 
+import throwIfUndefined from '@/utils/throwIfUndefined'
 import {
-  connectorsForWallets,
   darkTheme,
   getDefaultWallets,
   RainbowKitProvider,
 } from '@rainbow-me/rainbowkit'
-import { metaMaskWallet } from '@rainbow-me/rainbowkit/wallets'
 import { baseGoerli } from 'viem/chains'
 import { configureChains, createConfig, WagmiConfig } from 'wagmi'
 import { publicProvider } from 'wagmi/providers/public'
-import throwIfUndefined from '@/utils/throwIfUndefined'
 
 type WalletProviderProps = {
   children: React.ReactNode

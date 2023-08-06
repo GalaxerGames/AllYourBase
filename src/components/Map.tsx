@@ -22,10 +22,11 @@ const Map: React.FC = () => {
   const [lat, setLat] = useState(43.640879813830125)
   const [lng, setLng] = useState(-79.35509656466336)
   const [zoom, setZoom] = useState(15)
-  const [timeSpent, setTimeSpent] = useState(0) //in seconds
-  const timeRef = useRef<any | null>(null)
   const [userLatitute, setUserLatitude] = useState<number>(0)
   const [userLongitude, setUserLongitude] = useState<number>(0)
+  const [currentAttestation, setCurrentAttestation] = useState<
+    string | undefined
+  >()
 
   useEffect(() => {
     if (mapRef.current || !mapContainerRef.current) return // initialize map only once
@@ -91,12 +92,13 @@ const Map: React.FC = () => {
   const start = async () => {
     if (!address || !signer) return //TODO: error toast
 
-    await createStartAttestation(
+    const startAttestationID = await createStartAttestation(
       address,
       userLatitute.toString(),
       userLongitude.toString(),
       signer
     )
+    setCurrentAttestation(startAttestationID)
   }
 
   return (
