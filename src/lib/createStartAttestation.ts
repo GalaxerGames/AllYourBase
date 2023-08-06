@@ -27,7 +27,7 @@ export default async function createStartAttestation(
   const tx = await eas.attest({
     schema: easUIDs.start,
     data: {
-      recipient: easUIDs.end,
+      recipient: address,
       data: encodedData,
     },
   })
