@@ -1,6 +1,7 @@
 import { easAddress, easUIDs } from '@/consts'
 import { EAS, SchemaEncoder } from '@ethereum-attestation-service/eas-sdk'
 import { Signer } from 'ethers'
+import { zeroAddress } from 'viem'
 
 export default async function createStartAttestation(
   address: `0x${string}`,
@@ -27,8 +28,10 @@ export default async function createStartAttestation(
   const tx = await eas.attest({
     schema: easUIDs.start,
     data: {
-      recipient: address,
+      recipient: zeroAddress,
       data: encodedData,
+      expirationTime: 0n,
+      revocable: false,
     },
   })
 

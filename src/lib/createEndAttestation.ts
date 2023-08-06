@@ -1,6 +1,7 @@
 import { easAddress, easUIDs } from '@/consts'
 import { EAS, SchemaEncoder } from '@ethereum-attestation-service/eas-sdk'
 import { Signer } from 'ethers'
+import { zeroAddress } from 'viem'
 
 export default async function createEndAttestation(
   address: `0x${string}`,
@@ -27,12 +28,16 @@ export default async function createEndAttestation(
     { name: 'TIME_IN_ZONE', value: timeInZone, type: 'uint256' },
   ])
 
-  return await eas.attest({
+  const tx = await eas.attest({
     schema: easUIDs.end,
     data: {
-      recipient: address,
+      recipient: zeroAddress,
       data: encodedData,
       refUID: startAttestationUID,
+      expirationTime: 0n,
+      revocable: false,
     },
   })
+
+  return await tx.wait()
 }
