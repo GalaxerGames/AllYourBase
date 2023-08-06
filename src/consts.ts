@@ -1,6 +1,6 @@
 export const easUIDs = {
   start: '0x46378ec9710e3436d8f360b409052adb7d4ee811986f9c88e60efa637f83956d',
-  end: '0xa627c6397340d528f2488d637f1da2997997456dcecddd0a72b61c1e92231081',
+  end: '0x8b5ab95dfa10f3bcf3e5bd3d2820aca9a2d92097ffbeda05974e5852f559a470',
 }
 
 export const easAddress = {

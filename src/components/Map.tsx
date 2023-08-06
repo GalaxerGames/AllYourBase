@@ -10,6 +10,8 @@ import { useAccount } from 'wagmi'
 import type { Position } from 'geojson'
 import createStartAttestation from '@/lib/createStartAttestation'
 import { useEthersSigner } from '@/hooks/useEthersSigner'
+import createEndAttestation from '@/lib/createEndAttestation'
+import Timer from './Timer'
 mapboxgl.accessToken = throwIfUndefined(
   process.env.NEXT_PUBLIC_MAP_API_KEY,
   'Missing env MAP_API_KEY'
@@ -27,6 +29,8 @@ const Map: React.FC = () => {
   const [currentAttestation, setCurrentAttestation] = useState<
     string | undefined
   >()
+  const [time, setTime] = useState<number>(0)
+  const intervalRef = useRef<NodeJS.Timeout | null>(null)
 
   useEffect(() => {
     if (mapRef.current || !mapContainerRef.current) return // initialize map only once
@@ -98,7 +102,24 @@ const Map: React.FC = () => {
       userLongitude.toString(),
       signer
     )
+
     setCurrentAttestation(startAttestationID)
+  }
+
+  const end = async () => {
+    if (!address || !signer || !currentAttestation) return //TODO: error toast
+
+    await createEndAttestation(
+      address,
+      userLatitute.toString(),
+      userLongitude.toString(),
+      time,
+      signer,
+      currentAttestation
+    )
+
+    setCurrentAttestation(undefined)
+    clearInterval(intervalRef.current as NodeJS.Timeout)
   }
 
   return (
@@ -109,12 +130,17 @@ const Map: React.FC = () => {
         </span>
       </div>
       <div ref={mapContainerRef} style={{ width: '100%', height: '80dvh' }} />
-      <button
-        className="px-3 py-1 rounded text-white bg-yellow-600"
-        onClick={start}
-      >
-        START
-      </button>
+      <div className="flex gap-10 items-center justify-center">
+        {currentAttestation && (
+          <Timer intervalRef={intervalRef} time={time} setTime={setTime} />
+        )}
+        <button
+          className="px-3 py-1 rounded text-white bg-yellow-600"
+          onClick={currentAttestation ? end : start}
+        >
+          {currentAttestation ? 'END' : 'START'}
+        </button>
+      </div>
     </div>
   )
 }
