@@ -3,7 +3,7 @@ import 'mapbox-gl/dist/mapbox-gl.css'
 
 import { useEffect, useRef, useState } from 'react'
 import { useAccount } from 'wagmi'
-import mapboxgl, { Map as MapboxMap } from 'mapbox-gl'
+import mapboxgl, { GeoJSONSource, Map as MapboxMap } from 'mapbox-gl'
 import throwIfUndefined from '@/utils/throwIfUndefined'
 import features from '@/data/features.json'
 import { FeatureCollection } from 'geojson'
@@ -23,8 +23,8 @@ const MapComponent: React.FC = () => {
   const mapContainerRef = useRef<HTMLDivElement | null>(null)
   const mapRef = useRef<MapboxMap | null>(null)
   const { address } = useAccount()
-  const [lat, setLat] = useState(43.640879813830125)
-  const [lng, setLng] = useState(-79.35509656466336)
+  const [lat, setLat] = useState(38.7629)
+  const [lng, setLng] = useState(-9.18)
   const [zoom, setZoom] = useState(15)
   const [userLatitute, setUserLatitude] = useState<number>(0)
   const [userLongitude, setUserLongitude] = useState<number>(0)
@@ -33,6 +33,9 @@ const MapComponent: React.FC = () => {
   >()
   const [time, setTime] = useState<number>(0)
   const intervalRef = useRef<NodeJS.Timeout | null>(null)
+  const [currentFeature, setCurrentFeature] = useState<
+    GeoJSON.Feature<GeoJSON.Geometry> | undefined
+  >()
 
   useEffect(() => {
     if (mapRef.current || !mapContainerRef.current) return // initialize map only once
@@ -48,18 +51,6 @@ const MapComponent: React.FC = () => {
       setZoom(+mapRef.current!.getZoom().toFixed(2))
     })
 
-    mapRef.current.addControl(
-      new mapboxgl.GeolocateControl({
-        positionOptions: {
-          enableHighAccuracy: true,
-        },
-        // When active the map will receive updates to the device's location as it changes.
-        trackUserLocation: true,
-        // Draw an arrow next to the location dot to indicate which direction the device is heading.
-        showUserHeading: true,
-      })
-    )
-
     mapRef.current.on('load', () => {
       mapRef.current?.addLayer({
         id: 'polygons',
@@ -71,15 +62,27 @@ const MapComponent: React.FC = () => {
         layout: {},
         paint: { 'fill-color': '#0080ff', 'fill-opacity': 0.5 },
       })
+
+      mapRef.current?.addSource('current-polygon', {
+        type: 'geojson',
+        data: {
+          type: 'FeatureCollection',
+          features: [],
+        },
+      })
     })
 
-    mapRef.current.addSource('conquer-polygon', {
-      type: 'geojson',
-      data: {
-        type: 'FeatureCollection',
-        features: [],
-      },
-    })
+    mapRef.current.addControl(
+      new mapboxgl.GeolocateControl({
+        positionOptions: {
+          enableHighAccuracy: true,
+        },
+        // When active the map will receive updates to the device's location as it changes.
+        trackUserLocation: true,
+        // Draw an arrow next to the location dot to indicate which direction the device is heading.
+        showUserHeading: true,
+      })
+    )
 
     if (navigator) navigator?.geolocation?.watchPosition(checkUserPostion)
   }, [])
@@ -96,9 +99,31 @@ const MapComponent: React.FC = () => {
     features.features.forEach((feature) => {
       const isPointInPolygon = booleanPointInPolygon(point, feature.geometry)
 
-      if (isPointInPolygon) {
+      if (isPointInPolygon && mapRef.current?.isStyleLoaded()) {
         // Handle your logic here when the point is within a polygon
         console.log('User point is within polygon:', feature.properties.name)
+        setCurrentFeature(feature as GeoJSON.Feature<GeoJSON.Geometry>)
+
+        const source = mapRef.current?.getSource(
+          'current-polygon'
+        ) as GeoJSONSource
+
+        source?.setData({
+          type: 'FeatureCollection',
+          features: [feature as GeoJSON.Feature<GeoJSON.Geometry>],
+        })
+
+        if (mapRef.current?.getLayer('current-polygon')) {
+          mapRef.current?.removeLayer('current-polygon')
+        }
+
+        mapRef.current?.addLayer({
+          id: 'current-polygon',
+          type: 'fill',
+          source: 'current-polygon',
+          layout: {},
+          paint: { 'fill-color': '#FFFF00', 'fill-opacity': 0.5 },
+        })
       }
     })
   }
@@ -141,17 +166,19 @@ const MapComponent: React.FC = () => {
         </span>
       </div>
       <div ref={mapContainerRef} style={{ width: '100%', height: '80dvh' }} />
-      <div className="flex gap-10 items-center justify-center">
-        {currentAttestation && (
-          <Timer intervalRef={intervalRef} time={time} setTime={setTime} />
-        )}
-        <button
-          className="px-3 py-1 rounded text-white bg-yellow-600"
-          onClick={currentAttestation ? end : start}
-        >
-          {currentAttestation ? 'END' : 'START'}
-        </button>
-      </div>
+      {currentFeature && (
+        <div className="flex gap-10 items-center justify-center">
+          {currentAttestation && (
+            <Timer intervalRef={intervalRef} time={time} setTime={setTime} />
+          )}
+          <button
+            className="px-3 py-1 rounded text-white bg-yellow-600"
+            onClick={currentAttestation ? end : start}
+          >
+            {currentAttestation ? 'END' : 'START'}
+          </button>
+        </div>
+      )}
     </div>
   )
 }
