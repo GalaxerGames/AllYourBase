@@ -1,23 +1,25 @@
 'use client'
 import 'mapbox-gl/dist/mapbox-gl.css'
 
-import polygons from '@/data/polygons.json'
-import throwIfUndefined from '@/utils/throwIfUndefined'
-import mapboxgl, { Map as MapboxMap } from 'mapbox-gl'
 import { useEffect, useRef, useState } from 'react'
 import { useAccount } from 'wagmi'
+import mapboxgl, { Map as MapboxMap } from 'mapbox-gl'
+import throwIfUndefined from '@/utils/throwIfUndefined'
+import features from '@/data/features.json'
+import { FeatureCollection } from 'geojson'
+import booleanPointInPolygon from '@turf/boolean-point-in-polygon'
 
-import type { Position } from 'geojson'
 import createStartAttestation from '@/lib/createStartAttestation'
 import { useEthersSigner } from '@/hooks/useEthersSigner'
 import createEndAttestation from '@/lib/createEndAttestation'
+import { Coord } from '@turf/helpers'
 import Timer from './Timer'
 mapboxgl.accessToken = throwIfUndefined(
   process.env.NEXT_PUBLIC_MAP_API_KEY,
   'Missing env MAP_API_KEY'
 )
 
-const Map: React.FC = () => {
+const MapComponent: React.FC = () => {
   const mapContainerRef = useRef<HTMLDivElement | null>(null)
   const mapRef = useRef<MapboxMap | null>(null)
   const { address } = useAccount()
@@ -57,39 +59,48 @@ const Map: React.FC = () => {
         showUserHeading: true,
       })
     )
-    mapRef.current?.on('load', () => {
-      polygons.forEach((pol) => {
-        mapRef.current?.addSource(pol.id, {
+
+    mapRef.current.on('load', () => {
+      mapRef.current?.addLayer({
+        id: 'polygons',
+        type: 'fill',
+        source: {
           type: 'geojson',
-          data: {
-            type: 'Feature',
-            properties: {},
-            geometry: {
-              type: 'Polygon',
-              coordinates: pol.coords as Position[][],
-            },
-          },
-        })
-        mapRef.current?.addLayer({
-          id: pol.id,
-          type: 'fill',
-          source: pol.id, // reference the data source
-          layout: {},
-          paint: {
-            'fill-color': '#0080ff',
-            'fill-opacity': 0.5,
-          },
-        })
+          data: features as FeatureCollection,
+        },
+        layout: {},
+        paint: { 'fill-color': '#0080ff', 'fill-opacity': 0.5 },
       })
     })
+
+    mapRef.current.addSource('conquer-polygon', {
+      type: 'geojson',
+      data: {
+        type: 'FeatureCollection',
+        features: [],
+      },
+    })
+
     if (navigator) navigator?.geolocation?.watchPosition(checkUserPostion)
   }, [])
 
   // called every time a new user position is determined
-  function checkUserPostion(position: GeolocationPosition) {
+  const checkUserPostion = (position: GeolocationPosition) => {
     const { latitude, longitude } = position.coords
     setUserLatitude(latitude)
     setUserLongitude(longitude)
+    checkIfInsidePolygon([longitude, latitude])
+  }
+
+  const checkIfInsidePolygon = (point: Coord) => {
+    features.features.forEach((feature) => {
+      const isPointInPolygon = booleanPointInPolygon(point, feature.geometry)
+
+      if (isPointInPolygon) {
+        // Handle your logic here when the point is within a polygon
+        console.log('User point is within polygon:', feature.properties.name)
+      }
+    })
   }
   const signer = useEthersSigner()
 
@@ -144,4 +155,4 @@ const Map: React.FC = () => {
     </div>
   )
 }
-export default Map
+export default MapComponent
