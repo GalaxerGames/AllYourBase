@@ -130,20 +130,22 @@ const MapComponent: React.FC = () => {
   const signer = useEthersSigner()
 
   const start = async () => {
-    if (!address || !signer) return //TODO: error toast
+    if (!address || !signer || !currentFeature?.id) return //TODO: error toast
 
     const startAttestationID = await createStartAttestation(
       address,
       userLatitute.toString(),
       userLongitude.toString(),
-      signer
+      signer,
+      currentFeature.id.toString()
     )
 
     setCurrentAttestation(startAttestationID)
   }
 
   const end = async () => {
-    if (!address || !signer || !currentAttestation) return //TODO: error toast
+    if (!address || !signer || !currentAttestation || !currentFeature?.id)
+      return //TODO: error toast
 
     await createEndAttestation(
       address,
@@ -151,7 +153,8 @@ const MapComponent: React.FC = () => {
       userLongitude.toString(),
       time,
       signer,
-      currentAttestation
+      currentAttestation,
+      currentFeature.id.toString()
     )
 
     setCurrentAttestation(undefined)

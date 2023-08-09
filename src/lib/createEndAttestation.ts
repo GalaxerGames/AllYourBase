@@ -9,7 +9,8 @@ export default async function createEndAttestation(
   long: string,
   timeInZone: number,
   signer: Signer,
-  startAttestationUID: string
+  startAttestationUID: string,
+  polygonID: string
 ) {
   const EASContractAddress = easAddress.baseGoerli //TODO make dynamic
 
@@ -18,11 +19,12 @@ export default async function createEndAttestation(
   eas.connect(signer)
 
   const schemaEncoder = new SchemaEncoder(
-    'address ADDRESS, string LATITUDE, string LONGITUDE, uint256 TIME_IN_ZONE'
+    'address ADDRESS, string POLYGONID, string LATITUDE, string LONGITUDE, uint256 TIME_IN_ZONE'
   )
 
   const encodedData = schemaEncoder.encodeData([
     { name: 'ADDRESS', value: address, type: 'address' },
+    { name: 'POLYGONID', value: polygonID, type: 'string' },
     { name: 'LATITUDE', value: lat, type: 'string' },
     { name: 'LONGITUDE', value: long, type: 'string' },
     { name: 'TIME_IN_ZONE', value: timeInZone, type: 'uint256' },
