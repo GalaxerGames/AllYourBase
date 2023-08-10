@@ -9,8 +9,12 @@ import { Coord } from '@turf/helpers'
 import { FeatureCollection } from 'geojson'
 import mapboxgl, { GeoJSONSource, Map as MapboxMap } from 'mapbox-gl'
 import { useEffect, useRef, useState } from 'react'
+import { useAccount } from 'wagmi'
 
 import ActionButton from './ActionsButton'
+import getPolygonsData, { EndAttestation } from '@/lib/getPolygonsData'
+import { EAS_SCHEMA_UIDs } from '@/consts'
+import { zeroAddress } from 'viem'
 mapboxgl.accessToken = throwIfUndefined(
   process.env.NEXT_PUBLIC_MAP_API_KEY,
   'Missing env MAP_API_KEY'
@@ -24,10 +28,17 @@ const MapComponent: React.FC = () => {
   const [zoom, setZoom] = useState(15)
   const [userLatitute, setUserLatitude] = useState<number>(0)
   const [userLongitude, setUserLongitude] = useState<number>(0)
-
   const [currentFeature, setCurrentFeature] = useState<
     GeoJSON.Feature<GeoJSON.Geometry> | undefined
   >()
+  const { address } = useAccount()
+
+  const { owned, rest } = getPolygonsData(
+    EAS_SCHEMA_UIDs.end,
+    address ?? zeroAddress
+  )
+
+  console.log('YAS', { owned, rest })
 
   useEffect(() => {
     if (mapRef.current || !mapContainerRef.current) return // initialize map only once

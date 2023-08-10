@@ -1,5 +1,5 @@
-import { getClient } from '@/providers/ApolloClient'
 import GET_EAS_ATTESTATIONS from '@/queries/GET_EAS_ATTESTATIONS.query'
+import { useSuspenseQuery } from '@apollo/experimental-nextjs-app-support/ssr'
 
 export type EndAttestation = [
   {
@@ -57,14 +57,13 @@ export type EndAttestation = [
   }
 ]
 
-export default async function getPolygonsData(
+export default function getPolygonsData(
   schemaId: string,
   ownerAddress: `0x${string}`
 ) {
-  const { data: rawData } = await getClient().query<{
+  const { data: rawData } = useSuspenseQuery<{
     attestations: { decodedDataJson: string }[]
-  }>({
-    query: GET_EAS_ATTESTATIONS,
+  }>(GET_EAS_ATTESTATIONS, {
     variables: {
       schemaId: schemaId,
     },
@@ -74,7 +73,9 @@ export default async function getPolygonsData(
     JSON.parse(x.decodedDataJson)
   )
 
-  if (!data) return undefined
+  if (!data) return { owned: undefined, rest: undefined }
+
+  // filter data to a set of polygon IDS with the max TIME_IN_ZONE
 
   const owned: EndAttestation[] = data.filter(
     (x) => x[0].value.value === ownerAddress
