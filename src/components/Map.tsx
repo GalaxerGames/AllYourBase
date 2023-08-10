@@ -1,44 +1,30 @@
 'use client'
+
 import 'mapbox-gl/dist/mapbox-gl.css'
 
-import { useEffect, useRef, useState } from 'react'
-import { useAccount } from 'wagmi'
-import mapboxgl, { GeoJSONSource, Map as MapboxMap } from 'mapbox-gl'
-import throwIfUndefined from '@/utils/throwIfUndefined'
 import features from '@/data/features.json'
-import { FeatureCollection } from 'geojson'
+import throwIfUndefined from '@/utils/throwIfUndefined'
 import booleanPointInPolygon from '@turf/boolean-point-in-polygon'
-
-import createStartAttestation from '@/lib/createStartAttestation'
-import { useEthersSigner } from '@/hooks/useEthersSigner'
-import createEndAttestation from '@/lib/createEndAttestation'
 import { Coord } from '@turf/helpers'
-import Timer from './Timer'
-import { EndAttestation } from '@/lib/getPolygonsData'
+import { FeatureCollection } from 'geojson'
+import mapboxgl, { GeoJSONSource, Map as MapboxMap } from 'mapbox-gl'
+import { useEffect, useRef, useState } from 'react'
+
+import ActionButton from './ActionsButton'
 mapboxgl.accessToken = throwIfUndefined(
   process.env.NEXT_PUBLIC_MAP_API_KEY,
   'Missing env MAP_API_KEY'
 )
 
-type MapProps = {
-  data: EndAttestation[] | undefined
-}
-
-const MapComponent: React.FC<MapProps> = ({ data }) => {
-  console.log(data)
+const MapComponent: React.FC = () => {
   const mapContainerRef = useRef<HTMLDivElement | null>(null)
   const mapRef = useRef<MapboxMap | null>(null)
-  const { address } = useAccount()
   const [lat, setLat] = useState(38.7629)
   const [lng, setLng] = useState(-9.18)
   const [zoom, setZoom] = useState(15)
   const [userLatitute, setUserLatitude] = useState<number>(0)
   const [userLongitude, setUserLongitude] = useState<number>(0)
-  const [currentAttestation, setCurrentAttestation] = useState<
-    string | undefined
-  >()
-  const [time, setTime] = useState<number>(0)
-  const intervalRef = useRef<NodeJS.Timeout | null>(null)
+
   const [currentFeature, setCurrentFeature] = useState<
     GeoJSON.Feature<GeoJSON.Geometry> | undefined
   >()
@@ -106,8 +92,6 @@ const MapComponent: React.FC<MapProps> = ({ data }) => {
       const isPointInPolygon = booleanPointInPolygon(point, feature.geometry)
 
       if (isPointInPolygon && mapRef.current?.isStyleLoaded()) {
-        // Handle your logic here when the point is within a polygon
-        console.log('User point is within polygon:', feature.properties.name)
         setCurrentFeature(feature as GeoJSON.Feature<GeoJSON.Geometry>)
 
         const source = mapRef.current?.getSource(
@@ -133,43 +117,9 @@ const MapComponent: React.FC<MapProps> = ({ data }) => {
       }
     })
   }
-  const signer = useEthersSigner()
-
-  const start = async () => {
-    if (!address || !signer || !currentFeature?.id) return //TODO: error toast
-    setCurrentAttestation(undefined)
-    setTime(0)
-    const startAttestationID = await createStartAttestation(
-      address,
-      userLatitute.toString(),
-      userLongitude.toString(),
-      signer,
-      currentFeature.id.toString()
-    )
-
-    setCurrentAttestation(startAttestationID)
-  }
-
-  const end = async () => {
-    if (!address || !signer || !currentAttestation || !currentFeature?.id)
-      return //TODO: error toast
-
-    await createEndAttestation(
-      address,
-      userLatitute.toString(),
-      userLongitude.toString(),
-      time,
-      signer,
-      currentAttestation,
-      currentFeature.id.toString()
-    )
-
-    setCurrentAttestation(undefined)
-    clearInterval(intervalRef.current as NodeJS.Timeout)
-  }
 
   return (
-    <div className="flex flex-col justify-center items-center w-full h-3/4 relative gap-5">
+    <section className="flex flex-col justify-center items-center w-full h-3/4 relative gap-5">
       <div className="absolute top-0 left-0 rounded py-1 px-2 z-10 m-3">
         <span>
           Longitude: {lng} | Latitude: {lat} | Zoom: {zoom}
@@ -177,19 +127,13 @@ const MapComponent: React.FC<MapProps> = ({ data }) => {
       </div>
       <div ref={mapContainerRef} style={{ width: '100%', height: '80dvh' }} />
       {currentFeature && (
-        <div className="flex gap-10 items-center justify-center">
-          {currentAttestation && (
-            <Timer intervalRef={intervalRef} time={time} setTime={setTime} />
-          )}
-          <button
-            className="px-3 py-1 rounded text-white bg-yellow-600"
-            onClick={currentAttestation ? end : start}
-          >
-            {currentAttestation ? 'END' : 'START'}
-          </button>
-        </div>
+        <ActionButton
+          currentFeature={currentFeature}
+          userLatitute={userLatitute}
+          userLongitude={userLongitude}
+        />
       )}
-    </div>
+    </section>
   )
 }
 export default MapComponent
