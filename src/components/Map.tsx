@@ -14,12 +14,18 @@ import { useEthersSigner } from '@/hooks/useEthersSigner'
 import createEndAttestation from '@/lib/createEndAttestation'
 import { Coord } from '@turf/helpers'
 import Timer from './Timer'
+import { EndAttestation } from '@/lib/getPolygonsData'
 mapboxgl.accessToken = throwIfUndefined(
   process.env.NEXT_PUBLIC_MAP_API_KEY,
   'Missing env MAP_API_KEY'
 )
 
-const MapComponent: React.FC = () => {
+type MapProps = {
+  data: EndAttestation[] | undefined
+}
+
+const MapComponent: React.FC<MapProps> = ({ data }) => {
+  console.log(data)
   const mapContainerRef = useRef<HTMLDivElement | null>(null)
   const mapRef = useRef<MapboxMap | null>(null)
   const { address } = useAccount()
@@ -131,7 +137,8 @@ const MapComponent: React.FC = () => {
 
   const start = async () => {
     if (!address || !signer || !currentFeature?.id) return //TODO: error toast
-
+    setCurrentAttestation(undefined)
+    setTime(0)
     const startAttestationID = await createStartAttestation(
       address,
       userLatitute.toString(),
