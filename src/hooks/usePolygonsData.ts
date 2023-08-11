@@ -64,7 +64,7 @@ export type PolygonByTimeAndUser = {
   time: number
 }
 
-export default function getPolygonsData(
+export default function usePolygonsData(
   schemaId: string,
   ownerAddress: `0x${string}`
 ) {
@@ -79,7 +79,7 @@ export default function getPolygonsData(
     },
   })
 
-  let data: EndAttestation[] = rawData?.attestations.map((x) =>
+  const data: EndAttestation[] = rawData?.attestations.map((x) =>
     JSON.parse(x.decodedDataJson)
   )
 

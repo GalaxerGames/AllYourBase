@@ -12,9 +12,9 @@ import { useEffect, useRef, useState } from 'react'
 import { useAccount } from 'wagmi'
 
 import ActionButton from './ActionsButton'
-import getPolygonsData from '@/lib/getPolygonsData'
 import { EAS_SCHEMA_UIDs } from '@/consts'
 import { zeroAddress } from 'viem'
+import usePolygonsData from '@/hooks/usePolygonsData'
 mapboxgl.accessToken = throwIfUndefined(
   process.env.NEXT_PUBLIC_MAP_API_KEY,
   'Missing env MAP_API_KEY'
@@ -33,12 +33,12 @@ const MapComponent: React.FC = () => {
   >()
   const { address } = useAccount()
 
-  const { owned, rest } = getPolygonsData(
+  const { owned, rest } = usePolygonsData(
     EAS_SCHEMA_UIDs.end,
     address ?? zeroAddress
   )
-
-  console.log(owned, rest)
+  const ownedPolygonIDs = owned.map((x) => x.polygonID)
+  const enemiesPolygonIDs = rest.map((x) => x.polygonID)
 
   useEffect(() => {
     if (mapRef.current || !mapContainerRef.current) return // initialize map only once
@@ -73,6 +73,42 @@ const MapComponent: React.FC = () => {
           features: [],
         },
       })
+
+      const ownedFeatures: FeatureCollection = {
+        type: 'FeatureCollection',
+        features: (features as FeatureCollection).features.filter((x) =>
+          ownedPolygonIDs.includes(x.id?.toString() ?? '')
+        ),
+      }
+
+      mapRef.current?.addLayer({
+        id: 'owned-polygons',
+        type: 'fill',
+        source: {
+          type: 'geojson',
+          data: ownedFeatures,
+        },
+        layout: {},
+        paint: { 'fill-color': '#008000', 'fill-opacity': 0.5 },
+      })
+
+      const enemyFeatures: FeatureCollection = {
+        type: 'FeatureCollection',
+        features: (features as FeatureCollection).features.filter((x) =>
+          enemiesPolygonIDs.includes(x.id?.toString() ?? '')
+        ),
+      }
+
+      mapRef.current?.addLayer({
+        id: 'enemy-polygons',
+        type: 'fill',
+        source: {
+          type: 'geojson',
+          data: enemyFeatures,
+        },
+        layout: {},
+        paint: { 'fill-color': '#FF0000', 'fill-opacity': 0.5 },
+      })
     })
 
     mapRef.current.addControl(
@@ -102,7 +138,11 @@ const MapComponent: React.FC = () => {
     features.features.forEach((feature) => {
       const isPointInPolygon = booleanPointInPolygon(point, feature.geometry)
 
-      if (isPointInPolygon && mapRef.current?.isStyleLoaded()) {
+      if (
+        isPointInPolygon &&
+        mapRef.current?.isStyleLoaded() &&
+        !ownedPolygonIDs.includes(feature.id)
+      ) {
         setCurrentFeature(feature as GeoJSON.Feature<GeoJSON.Geometry>)
 
         const source = mapRef.current?.getSource(
@@ -118,13 +158,13 @@ const MapComponent: React.FC = () => {
           mapRef.current?.removeLayer('current-polygon')
         }
 
-        mapRef.current?.addLayer({
-          id: 'current-polygon',
-          type: 'fill',
-          source: 'current-polygon',
-          layout: {},
-          paint: { 'fill-color': '#FFFF00', 'fill-opacity': 0.5 },
-        })
+        // mapRef.current?.addLayer({
+        //   id: 'current-polygon',
+        //   type: 'fill',
+        //   source: 'current-polygon',
+        //   layout: {},
+        //   paint: { 'fill-color': '#FFFF00', 'fill-opacity': 0.5 },
+        // })
       }
     })
   }
