@@ -1,7 +1,8 @@
 import GET_EAS_ATTESTATIONS from '@/queries/GET_EAS_ATTESTATIONS.query'
 import { useSuspenseQuery } from '@apollo/experimental-nextjs-app-support/ssr'
+import { fromHex } from 'viem'
 
-export type EndAttestation = [
+type EndAttestation = [
   {
     name: 'ADDRESS'
     type: 'address'
@@ -57,10 +58,19 @@ export type EndAttestation = [
   }
 ]
 
+export type PolygonByTimeAndUser = {
+  polygonID: string
+  owner: `0x${string}`
+  time: number
+}
+
 export default function getPolygonsData(
   schemaId: string,
   ownerAddress: `0x${string}`
 ) {
+  const owned: PolygonByTimeAndUser[] = []
+  const rest: PolygonByTimeAndUser[] = []
+
   const { data: rawData } = useSuspenseQuery<{
     attestations: { decodedDataJson: string }[]
   }>(GET_EAS_ATTESTATIONS, {
@@ -69,19 +79,36 @@ export default function getPolygonsData(
     },
   })
 
-  const data: EndAttestation[] = rawData?.attestations.map((x) =>
+  let data: EndAttestation[] = rawData?.attestations.map((x) =>
     JSON.parse(x.decodedDataJson)
   )
 
-  if (!data) return { owned: undefined, rest: undefined }
+  if (!data) return { owned, rest }
 
   // filter data to a set of polygon IDS with the max TIME_IN_ZONE
+  const bestTimePolygons = new Map<
+    string,
+    { time: number; owner: `0x${string}` }
+  >()
+  data.forEach((attestation) => {
+    const newVal = fromHex(attestation[4].value.value.hex, 'number')
+    if (
+      newVal > (bestTimePolygons.get(attestation[3].value.value)?.time ?? 0)
+    ) {
+      bestTimePolygons.set(attestation[3].value.value, {
+        time: newVal,
+        owner: attestation[0].value.value,
+      })
+    }
+  })
 
-  const owned: EndAttestation[] = data.filter(
-    (x) => x[0].value.value === ownerAddress
-  )
-
-  const rest = data.filter((x) => x[0].value.value !== ownerAddress)
+  for (const [k, v] of bestTimePolygons.entries()) {
+    if (v.owner === ownerAddress) {
+      owned.push({ polygonID: k, owner: v.owner, time: v.time })
+    } else {
+      rest.push({ polygonID: k, owner: v.owner, time: v.time })
+    }
+  }
 
   return { owned, rest }
 }

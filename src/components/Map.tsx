@@ -12,7 +12,7 @@ import { useEffect, useRef, useState } from 'react'
 import { useAccount } from 'wagmi'
 
 import ActionButton from './ActionsButton'
-import getPolygonsData, { EndAttestation } from '@/lib/getPolygonsData'
+import getPolygonsData from '@/lib/getPolygonsData'
 import { EAS_SCHEMA_UIDs } from '@/consts'
 import { zeroAddress } from 'viem'
 mapboxgl.accessToken = throwIfUndefined(
@@ -38,7 +38,7 @@ const MapComponent: React.FC = () => {
     address ?? zeroAddress
   )
 
-  console.log('YAS', { owned, rest })
+  console.log(owned, rest)
 
   useEffect(() => {
     if (mapRef.current || !mapContainerRef.current) return // initialize map only once
