@@ -1,6 +1,6 @@
 const MapLegend: React.FC = () => {
   return (
-    <div className="absolute p-5 bg-black rounded m-2 bottom-28 left-0 text-sm gap-2 flex flex-col">
+    <div className="absolute p-5 bg-black rounded m-2 bottom-20 left-0 text-sm gap-2 flex flex-col">
       <p className="font-semibold">Territory Legend</p>
       <ul>
         <li className="flex gap-2 items-center justify-start ">
