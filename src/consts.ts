@@ -1,8 +1,12 @@
-export const easUIDs = {
-  start: '0x48728b256b1f8e61436703b702a1c007574a496145714dd8e4b1292d095f3f1c',
-  end: '0x5445da81e8d38c23af74c8c7740e9ddd89b63ed25d6ec4c348861e9bc2bd8ceb',
+export const EAS_GRAPHQL_URL = {
+  baseGoerli: 'https://base-goerli.easscan.org/graphql',
 }
 
-export const easAddress = {
+export const EAS_SCHEMA_UIDs = {
+  start: '0x0cbff470cc67f070c4d42792e53a6659c5c37007f24f717f884cbb9e237c8426',
+  end: '0x5afe02dd71c2c70108ce4ba445d7baadd3d7cf8284a154c5c5e35c33687446ca',
+}
+
+export const EAS_ADDRESS = {
   baseGoerli: '0xAcfE09Fd03f7812F022FBf636700AdEA18Fd2A7A',
 }

@@ -1,5 +1,5 @@
 import Map from '@/components/Map'
 
-export default function Home() {
+export default async function Home() {
   return <Map />
 }
