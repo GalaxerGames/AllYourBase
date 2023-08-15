@@ -10,7 +10,7 @@ const MapLegend: React.FC = () => {
           <div className="w-2 h-2 bg-red-500" /> Enemy
         </li>
         <li className="flex gap-2 items-center justify-start">
-          <div className="w-2 h-2 bg-yellow-600" /> Neutral
+          <div className="w-2 h-2 bg-blue-600" /> Neutral
         </li>
       </ul>
     </div>
