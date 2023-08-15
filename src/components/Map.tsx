@@ -16,6 +16,8 @@ import { EAS_SCHEMA_UIDs } from '@/consts'
 import { zeroAddress } from 'viem'
 import usePolygonsData from '@/hooks/usePolygonsData'
 import MapLegend from './MapLegend'
+import { Toaster, toast } from 'sonner'
+
 mapboxgl.accessToken = throwIfUndefined(
   process.env.NEXT_PUBLIC_MAP_API_KEY,
   'Missing env MAP_API_KEY'
@@ -200,22 +202,25 @@ const MapComponent: React.FC = () => {
   }
 
   return (
-    <section className="flex flex-col justify-center items-center w-full h-3/4 relative gap-5">
-      <div className="absolute top-0 left-0 rounded py-1 px-2 z-10 m-3">
-        <span>
-          Longitude: {lng} | Latitude: {lat} | Zoom: {zoom}
-        </span>
-      </div>
-      <div ref={mapContainerRef} style={{ width: '100%', height: '80dvh' }} />
-      <MapLegend />
-      {currentFeature && (
-        <ActionButton
-          currentFeature={currentFeature}
-          userLatitute={userLatitute}
-          userLongitude={userLongitude}
-        />
-      )}
-    </section>
+    <>
+      <section className="flex flex-col justify-center items-center w-full h-3/4 relative gap-5">
+        <div className="absolute top-0 left-0 rounded py-1 px-2 z-10 m-3">
+          <span>
+            Longitude: {lng} | Latitude: {lat} | Zoom: {zoom}
+          </span>
+        </div>
+        <div ref={mapContainerRef} style={{ width: '100%', height: '80dvh' }} />
+        <MapLegend />
+        {currentFeature && (
+          <ActionButton
+            currentFeature={currentFeature}
+            userLatitute={userLatitute}
+            userLongitude={userLongitude}
+          />
+        )}
+      </section>
+      <Toaster />
+    </>
   )
 }
 export default MapComponent

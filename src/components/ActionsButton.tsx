@@ -4,6 +4,7 @@ import createStartAttestation from '@/lib/createStartAttestation'
 import { useRef, useState } from 'react'
 import { useAccount } from 'wagmi'
 import Timer from './Timer'
+import { toast } from 'sonner'
 
 type ActionButtonProps = {
   currentFeature: GeoJSON.Feature<GeoJSON.Geometry>
@@ -26,36 +27,51 @@ const ActionButton: React.FC<ActionButtonProps> = ({
   const intervalRef = useRef<NodeJS.Timeout | null>(null)
 
   const start = async () => {
-    if (!address || !signer || !currentFeature?.id) return //TODO: error toast
-    setCurrentAttestation(undefined)
-    setTime(0)
-    const startAttestationID = await createStartAttestation(
-      address,
-      userLatitute.toString(),
-      userLongitude.toString(),
-      signer,
-      currentFeature.id.toString()
-    )
+    if (!address || !signer || !currentFeature?.id)
+      return toast.error('Problem occured, please try again.')
 
-    setCurrentAttestation(startAttestationID)
+    try {
+      setCurrentAttestation(undefined)
+      setTime(0)
+      const startAttestationID = await createStartAttestation(
+        address,
+        userLatitute.toString(),
+        userLongitude.toString(),
+        signer,
+        currentFeature.id.toString()
+      )
+
+      setCurrentAttestation(startAttestationID)
+    } catch (error) {
+      console.log('HEY', error)
+      toast.error(
+        'Problem trying to make the attestation. \nPlease try again later.'
+      )
+    }
   }
 
   const end = async () => {
     if (!address || !signer || !currentAttestation || !currentFeature?.id)
-      return //TODO: error toast
+      return toast.error('Problem occured, please try again.')
 
-    await createEndAttestation(
-      address,
-      userLatitute.toString(),
-      userLongitude.toString(),
-      time,
-      signer,
-      currentAttestation,
-      currentFeature.id.toString()
-    )
+    try {
+      await createEndAttestation(
+        address,
+        userLatitute.toString(),
+        userLongitude.toString(),
+        time,
+        signer,
+        currentAttestation,
+        currentFeature.id.toString()
+      )
 
-    setCurrentAttestation(undefined)
-    clearInterval(intervalRef.current as NodeJS.Timeout)
+      setCurrentAttestation(undefined)
+      clearInterval(intervalRef.current as NodeJS.Timeout)
+    } catch (error) {
+      toast.error(
+        'Problem trying to make the attestation. \nPlease try again later.'
+      )
+    }
   }
 
   return (
