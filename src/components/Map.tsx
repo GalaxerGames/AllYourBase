@@ -75,40 +75,19 @@ const MapComponent: React.FC = () => {
         },
       })
 
-      const ownedFeatures: FeatureCollection = {
-        type: 'FeatureCollection',
-        features: (features as FeatureCollection).features.filter((x) =>
-          ownedPolygonIDs.includes(x.id?.toString() ?? '')
-        ),
-      }
-
-      mapRef.current?.addLayer({
-        id: 'owned',
-        type: 'fill',
-        source: {
-          type: 'geojson',
-          data: ownedFeatures,
+      mapRef.current?.addSource('owned', {
+        type: 'geojson',
+        data: {
+          type: 'FeatureCollection',
+          features: [],
         },
-        layout: {},
-        paint: { 'fill-color': '#008000', 'fill-opacity': 0.5 },
       })
-
-      const enemyFeatures: FeatureCollection = {
-        type: 'FeatureCollection',
-        features: (features as FeatureCollection).features.filter((x) =>
-          enemiesPolygonIDs.includes(x.id?.toString() ?? '')
-        ),
-      }
-
-      mapRef.current?.addLayer({
-        id: 'enemy',
-        type: 'fill',
-        source: {
-          type: 'geojson',
-          data: enemyFeatures,
+      mapRef.current?.addSource('enemy', {
+        type: 'geojson',
+        data: {
+          type: 'FeatureCollection',
+          features: [],
         },
-        layout: {},
-        paint: { 'fill-color': '#FF0000', 'fill-opacity': 0.5 },
       })
     })
 
@@ -126,6 +105,53 @@ const MapComponent: React.FC = () => {
 
     if (navigator) navigator?.geolocation?.watchPosition(checkUserPostion)
   }, [])
+
+  useEffect(() => {
+    if (!mapRef.current?.isStyleLoaded()) return
+    const ownedFeatures: FeatureCollection = {
+      type: 'FeatureCollection',
+      features: (features as FeatureCollection).features.filter((x) =>
+        ownedPolygonIDs.includes(x.id?.toString() ?? '')
+      ),
+    }
+    const ownedSource = mapRef.current?.getSource('owned') as GeoJSONSource
+
+    ownedSource?.setData(ownedFeatures)
+
+    if (mapRef.current?.getLayer('owned')) {
+      mapRef.current?.removeLayer('owned')
+    }
+    mapRef.current?.addLayer({
+      id: 'owned',
+      type: 'fill',
+      source: 'owned',
+      layout: {},
+      paint: { 'fill-color': '#008000', 'fill-opacity': 0.5 },
+    })
+
+    const enemyFeatures: FeatureCollection = {
+      type: 'FeatureCollection',
+      features: (features as FeatureCollection).features.filter((x) =>
+        enemiesPolygonIDs.includes(x.id?.toString() ?? '')
+      ),
+    }
+
+    const enemySource = mapRef.current?.getSource('enemy') as GeoJSONSource
+
+    enemySource?.setData(enemyFeatures)
+
+    if (mapRef.current?.getLayer('enemy')) {
+      mapRef.current?.removeLayer('enemy')
+    }
+
+    mapRef.current?.addLayer({
+      id: 'enemy',
+      type: 'fill',
+      source: 'enemy',
+      layout: {},
+      paint: { 'fill-color': '#FF0000', 'fill-opacity': 0.5 },
+    })
+  }, [enemiesPolygonIDs, ownedPolygonIDs])
 
   // called every time a new user position is determined
   const checkUserPostion = (position: GeolocationPosition) => {
