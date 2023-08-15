@@ -23,7 +23,6 @@ export default function RootLayout({
         <WalletProvider>
           <ApolloWrapper>
             <Header />
-
             <main className="flex flex-col h-full items-center justify-between p-10">
               {children}
             </main>
