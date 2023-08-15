@@ -15,6 +15,7 @@ import ActionButton from './ActionsButton'
 import { EAS_SCHEMA_UIDs } from '@/consts'
 import { zeroAddress } from 'viem'
 import usePolygonsData from '@/hooks/usePolygonsData'
+import MapLegend from './MapLegend'
 mapboxgl.accessToken = throwIfUndefined(
   process.env.NEXT_PUBLIC_MAP_API_KEY,
   'Missing env MAP_API_KEY'
@@ -56,7 +57,7 @@ const MapComponent: React.FC = () => {
 
     mapRef.current.on('load', () => {
       mapRef.current?.addLayer({
-        id: 'polygons',
+        id: 'neutral',
         type: 'fill',
         source: {
           type: 'geojson',
@@ -82,7 +83,7 @@ const MapComponent: React.FC = () => {
       }
 
       mapRef.current?.addLayer({
-        id: 'owned-polygons',
+        id: 'owned',
         type: 'fill',
         source: {
           type: 'geojson',
@@ -100,7 +101,7 @@ const MapComponent: React.FC = () => {
       }
 
       mapRef.current?.addLayer({
-        id: 'enemy-polygons',
+        id: 'enemy',
         type: 'fill',
         source: {
           type: 'geojson',
@@ -177,6 +178,7 @@ const MapComponent: React.FC = () => {
         </span>
       </div>
       <div ref={mapContainerRef} style={{ width: '100%', height: '80dvh' }} />
+      <MapLegend />
       {currentFeature && (
         <ActionButton
           currentFeature={currentFeature}
