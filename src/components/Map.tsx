@@ -57,7 +57,7 @@ const MapComponent: React.FC = () => {
 
     mapRef.current.on('load', () => {
       mapRef.current?.addLayer({
-        id: 'polygons',
+        id: 'neutral',
         type: 'fill',
         source: {
           type: 'geojson',
@@ -83,7 +83,7 @@ const MapComponent: React.FC = () => {
       }
 
       mapRef.current?.addLayer({
-        id: 'owned-polygons',
+        id: 'owned',
         type: 'fill',
         source: {
           type: 'geojson',
@@ -101,7 +101,7 @@ const MapComponent: React.FC = () => {
       }
 
       mapRef.current?.addLayer({
-        id: 'enemy-polygons',
+        id: 'enemy',
         type: 'fill',
         source: {
           type: 'geojson',
