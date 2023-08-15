@@ -24,8 +24,8 @@ mapboxgl.accessToken = throwIfUndefined(
 const MapComponent: React.FC = () => {
   const mapContainerRef = useRef<HTMLDivElement | null>(null)
   const mapRef = useRef<MapboxMap | null>(null)
-  const [lat, setLat] = useState(38.7629)
-  const [lng, setLng] = useState(-9.18)
+  const [lat, setLat] = useState(43.64)
+  const [lng, setLng] = useState(-79.35)
   const [zoom, setZoom] = useState(15)
   const [userLatitute, setUserLatitude] = useState<number>(0)
   const [userLongitude, setUserLongitude] = useState<number>(0)
