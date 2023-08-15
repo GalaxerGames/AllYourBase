@@ -108,6 +108,10 @@ const MapComponent: React.FC = () => {
 
   useEffect(() => {
     if (!mapRef.current?.isStyleLoaded()) return
+
+    setCurrentFeature(undefined)
+    checkIfInsidePolygon([userLongitude, userLatitute])
+
     const ownedFeatures: FeatureCollection = {
       type: 'FeatureCollection',
       features: (features as FeatureCollection).features.filter((x) =>
@@ -164,7 +168,6 @@ const MapComponent: React.FC = () => {
   const checkIfInsidePolygon = (point: Coord) => {
     features.features.forEach((feature) => {
       const isPointInPolygon = booleanPointInPolygon(point, feature.geometry)
-
       if (
         isPointInPolygon &&
         mapRef.current?.isStyleLoaded() &&
