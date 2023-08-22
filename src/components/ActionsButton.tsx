@@ -5,17 +5,28 @@ import { useRef, useState } from 'react'
 import { useAccount } from 'wagmi'
 import Timer from './Timer'
 import { toast } from 'sonner'
+import { ApolloQueryResult, OperationVariables } from '@apollo/client'
 
 type ActionButtonProps = {
   currentFeature: GeoJSON.Feature<GeoJSON.Geometry>
   userLatitute: number
   userLongitude: number
+  refetch:
+    | ((variables?: Partial<OperationVariables> | undefined) => Promise<
+        ApolloQueryResult<{
+          attestations: {
+            decodedDataJson: string
+          }[]
+        }>
+      >)
+    | undefined
 }
 
 const ActionButton: React.FC<ActionButtonProps> = ({
   currentFeature,
   userLatitute,
   userLongitude,
+  refetch,
 }) => {
   const { address } = useAccount()
   const signer = useEthersSigner()
@@ -43,7 +54,6 @@ const ActionButton: React.FC<ActionButtonProps> = ({
 
       setCurrentAttestation(startAttestationID)
     } catch (error) {
-      console.log('HEY', error)
       toast.error(
         'Problem trying to make the attestation. \nPlease try again later.'
       )
@@ -67,6 +77,9 @@ const ActionButton: React.FC<ActionButtonProps> = ({
 
       setCurrentAttestation(undefined)
       clearInterval(intervalRef.current as NodeJS.Timeout)
+      if (!!refetch) {
+        refetch()
+      }
     } catch (error) {
       toast.error(
         'Problem trying to make the attestation. \nPlease try again later.'

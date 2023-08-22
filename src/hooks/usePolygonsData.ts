@@ -71,11 +71,18 @@ export default function usePolygonsData(
   const owned: PolygonByTimeAndUser[] = []
   const rest: PolygonByTimeAndUser[] = []
 
-  const { data: rawData } = useSuspenseQuery<{
+  const { data: rawData, refetch } = useSuspenseQuery<{
     attestations: { decodedDataJson: string }[]
   }>(GET_EAS_ATTESTATIONS, {
     variables: {
       schemaId: schemaId,
+    },
+    queryKey: 'polygons',
+    fetchPolicy: 'no-cache',
+    context: {
+      fetchOptions: {
+        next: { revalidate: 5 },
+      },
     },
   })
 
@@ -110,5 +117,5 @@ export default function usePolygonsData(
     }
   }
 
-  return { owned, rest }
+  return { owned, rest, refetch }
 }

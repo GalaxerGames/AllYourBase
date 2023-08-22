@@ -4,7 +4,7 @@ const MapLegend: React.FC = () => {
       <p className="font-semibold">Territory Legend</p>
       <ul>
         <li className="flex gap-2 items-center justify-start ">
-          <div className="w-2 h-2 bg-green-700" /> Yours
+          <div className="w-2 h-2 bg-green-700" /> Owned
         </li>
         <li className="flex gap-2 items-center justify-start">
           <div className="w-2 h-2 bg-red-500" /> Enemy
