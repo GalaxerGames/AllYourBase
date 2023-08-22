@@ -30,7 +30,6 @@ const ActionButton: React.FC<ActionButtonProps> = ({
 }) => {
   const { address } = useAccount()
   const signer = useEthersSigner()
-
   const [currentAttestation, setCurrentAttestation] = useState<
     string | undefined
   >()
