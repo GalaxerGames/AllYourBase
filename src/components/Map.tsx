@@ -16,7 +16,7 @@ import { EAS_SCHEMA_UIDs } from '@/consts'
 import { zeroAddress } from 'viem'
 import usePolygonsData from '@/hooks/usePolygonsData'
 import MapLegend from './MapLegend'
-import { Toaster, toast } from 'sonner'
+import { Toaster } from 'sonner'
 import useIsMounted from '@/hooks/useIsMounted'
 
 mapboxgl.accessToken = throwIfUndefined(
@@ -38,7 +38,7 @@ const MapComponent: React.FC = () => {
   const { address } = useAccount()
   const isMounted = useIsMounted()
 
-  const { owned, rest } = usePolygonsData(
+  const { owned, rest, refetch } = usePolygonsData(
     EAS_SCHEMA_UIDs.end,
     address ?? zeroAddress
   )
@@ -218,6 +218,7 @@ const MapComponent: React.FC = () => {
             currentFeature={currentFeature}
             userLatitute={userLatitute}
             userLongitude={userLongitude}
+            refetch={refetch}
           />
         )}
       </section>
