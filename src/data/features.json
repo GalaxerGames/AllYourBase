@@ -3,7 +3,8 @@
     {
       "type": "Feature",
       "properties": {
-        "name": "YESSIR"
+        "id": "81beeb6fee1825d9deb1edc8aebb1ea7",
+        "name": "Test"
       },
       "geometry": {
         "coordinates": [
@@ -22,6 +23,7 @@
     {
       "type": "Feature",
       "properties": {
+        "id": "0a57aa621a645368f81f999bc496aa7d",
         "name": "Go Karts"
       },
       "geometry": {
@@ -41,6 +43,7 @@
     {
       "type": "Feature",
       "properties": {
+        "id": "5c1746b32ecf48d005648b217eb91f0c",
         "name": "Parking lot"
       },
       "geometry": {
@@ -64,6 +67,7 @@
     {
       "type": "Feature",
       "properties": {
+        "id": "8ce764cf7208f7219d1d0fa28a49dbe8",
         "name": "Cabana Area"
       },
       "geometry": {
@@ -83,6 +87,7 @@
     {
       "type": "Feature",
       "properties": {
+        "id": "97e5d784de95cdc361de3cb40c469f9f",
         "name": "Park"
       },
       "geometry": {
@@ -102,6 +107,7 @@
     {
       "type": "Feature",
       "properties": {
+        "id": "98afca9b5c639216a6af731fe73c2626",
         "name": "Venue"
       },
       "geometry": {
@@ -121,6 +127,7 @@
     {
       "type": "Feature",
       "properties": {
+        "id": "ed95198d1d8a70eeff423945737da5a0",
         "name": "Helipad"
       },
       "geometry": {

@@ -18,6 +18,7 @@ import usePolygonsData from '@/hooks/usePolygonsData'
 import MapLegend from './MapLegend'
 import { Toaster } from 'sonner'
 import useIsMounted from '@/hooks/useIsMounted'
+import getFeatureByPropertyName from '@/utils/getFeatureByPropertyName'
 
 mapboxgl.accessToken = throwIfUndefined(
   process.env.NEXT_PUBLIC_MAP_API_KEY,
@@ -92,6 +93,34 @@ const MapComponent: React.FC = () => {
           type: 'FeatureCollection',
           features: [],
         },
+      })
+
+      mapRef.current?.on('click', ['neutral', 'owned', 'enemy'], (e) => {
+        console.log('click', e.features)
+
+        if (e.features && mapRef.current && e.features.length) {
+          const ownerAndTime: { owner: string; time: number } =
+            getFeatureByPropertyName(e.features[0], owned, rest)
+
+          new mapboxgl.Popup({ className: 'color: #000' })
+            .setLngLat(e.lngLat)
+            .setHTML(
+              `<h3>${e.features[0].properties?.name}<h3><h4>Owned by: ${ownerAndTime.owner}</h4><h4>Current Time: ${ownerAndTime.time}s</h4>`
+            )
+            .addTo(mapRef.current)
+        }
+      })
+
+      // Change the cursor to a pointer when
+      // the mouse is over the states layer.
+      mapRef.current?.on('mouseenter', 'states-layer', () => {
+        if (mapRef.current) mapRef.current.getCanvas().style.cursor = 'pointer'
+      })
+
+      // Change the cursor back to a pointer
+      // when it leaves the states layer.
+      mapRef.current?.on('mouseleave', 'states-layer', () => {
+        if (mapRef.current) mapRef.current.getCanvas().style.cursor = ''
       })
     })
 
@@ -211,7 +240,7 @@ const MapComponent: React.FC = () => {
             Longitude: {lng} | Latitude: {lat} | Zoom: {zoom}
           </span>
         </div>
-        <div ref={mapContainerRef} style={{ width: '100%', height: '80dvh' }} />
+        <div className="w-full h-[80dvh]" ref={mapContainerRef} />
         <MapLegend />
         {isMounted && address && currentFeature && (
           <ActionButton
