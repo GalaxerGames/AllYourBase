@@ -17,6 +17,7 @@ import { zeroAddress } from 'viem'
 import usePolygonsData from '@/hooks/usePolygonsData'
 import MapLegend from './MapLegend'
 import { Toaster, toast } from 'sonner'
+import useIsMounted from '@/hooks/useIsMounted'
 
 mapboxgl.accessToken = throwIfUndefined(
   process.env.NEXT_PUBLIC_MAP_API_KEY,
@@ -35,6 +36,7 @@ const MapComponent: React.FC = () => {
     GeoJSON.Feature<GeoJSON.Geometry> | undefined
   >()
   const { address } = useAccount()
+  const isMounted = useIsMounted()
 
   const { owned, rest } = usePolygonsData(
     EAS_SCHEMA_UIDs.end,
@@ -211,7 +213,7 @@ const MapComponent: React.FC = () => {
         </div>
         <div ref={mapContainerRef} style={{ width: '100%', height: '80dvh' }} />
         <MapLegend />
-        {currentFeature && (
+        {isMounted && address && currentFeature && (
           <ActionButton
             currentFeature={currentFeature}
             userLatitute={userLatitute}
