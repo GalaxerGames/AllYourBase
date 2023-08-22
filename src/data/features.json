@@ -3,6 +3,26 @@
     {
       "type": "Feature",
       "properties": {
+        "id": "382710e9c48eeee21c982160e06dbc20",
+        "name": "Parque Hortícula da Horta Nova"
+      },
+      "geometry": {
+        "coordinates": [
+          [
+            [-9.179685, 38.766711],
+            [-9.181591, 38.76538],
+            [-9.179893, 38.764231],
+            [-9.177961, 38.765508],
+            [-9.179685, 38.766711]
+          ]
+        ],
+        "type": "Polygon"
+      },
+      "id": "382710e9c48eeee21c982160e06dbc20"
+    },
+    {
+      "type": "Feature",
+      "properties": {
         "name": "Jardim da Luz",
         "id": "44cea32758d117a3486cee4cbb4548fe"
       },
