@@ -45,7 +45,7 @@ Galaxer aims to revolutionize the gaming landscape by providing an immersive and
 
 4. Run the development server:
    ```bash
-   next dev
+   yarn dev
    ```
 
 5. Open your browser and navigate to `http://localhost:3000`.
