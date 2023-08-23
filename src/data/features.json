@@ -3,6 +3,30 @@
     {
       "type": "Feature",
       "properties": {
+        "id": "021c0ef9b705d16d5e0d519a0d5e8192",
+        "name": "Convento de São João da Cruz"
+      },
+      "geometry": {
+        "coordinates": [
+          [
+            [-9.184863, 38.764021],
+            [-9.185045, 38.763609],
+            [-9.185623, 38.762883],
+            [-9.185199, 38.761438],
+            [-9.184805, 38.761578],
+            [-9.184861, 38.761675],
+            [-9.183235, 38.762105],
+            [-9.182549, 38.76371],
+            [-9.184863, 38.764021]
+          ]
+        ],
+        "type": "Polygon"
+      },
+      "id": "021c0ef9b705d16d5e0d519a0d5e8192"
+    },
+    {
+      "type": "Feature",
+      "properties": {
         "id": "382710e9c48eeee21c982160e06dbc20",
         "name": "Parque Hortícula da Horta Nova"
       },
