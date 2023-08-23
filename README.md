@@ -58,7 +58,6 @@ The app leverages the power of **Coinbase's Base blockchain** on the **Goerli te
 
 - [Mapbox](https://mapbox.com/): For rendering interactive maps.
 - [Ethereum Attestation Service](https://ethereum.org/): For secure blockchain attestations.
-- ... (List other dependencies)
 
 
 ## 📣 Acknowledgements
