@@ -23,7 +23,7 @@ Galaxer aims to revolutionize the gaming landscape by providing an immersive and
 
 ### Prerequisites
 
-- Node.js and npm installed
+- Node.js and yarn installed
 - Next.js CLI
 
 ### Installation & Running
@@ -40,7 +40,7 @@ Galaxer aims to revolutionize the gaming landscape by providing an immersive and
 
 3. Install the dependencies:
    ```bash
-   npm install
+   yarn install
    ```
 
 4. Run the development server:
@@ -60,9 +60,6 @@ The app leverages the power of **Coinbase's Base blockchain** on the **Goerli te
 - [Ethereum Attestation Service](https://ethereum.org/): For secure blockchain attestations.
 - ... (List other dependencies)
 
-## 🤝 Contributing
-
-We welcome contributions! Please see our [CONTRIBUTING.md](CONTRIBUTING.md) for details.
 
 ## 📣 Acknowledgements
 
